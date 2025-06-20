@@ -1,61 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zinx Bet Signup</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Zinx Bet — Sign Up</title>
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #000000, #1a1a1a);
-      color: white;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #000000, #1f1f1f);
+      color: #fff;
       display: flex;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       height: 100vh;
+    }
+    .signup-box {
+      background: #121212;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+      max-width: 400px;
+      width: 100%;
     }
     h2 {
       color: #FFD700;
-    }
-    form {
-      display: flex;
-      flex-direction: column;
-      width: 90%;
-      max-width: 320px;
+      text-align: center;
     }
     input {
-      margin: 10px 0;
+      width: 100%;
       padding: 12px;
-      font-size: 16px;
-      border-radius: 5px;
+      margin: 10px 0;
       border: none;
+      border-radius: 6px;
     }
     button {
-      background-color: #FFD700;
-      color: black;
+      width: 100%;
       padding: 12px;
-      font-size: 16px;
+      background: #FFD700;
       border: none;
-      border-radius: 5px;
+      color: black;
+      font-weight: bold;
+      border-radius: 6px;
       cursor: pointer;
-      margin-top: 10px;
+    }
+    p {
+      text-align: center;
+      margin-top: 1rem;
+    }
+    a {
+      color: #FFD700;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
-  <h2>Create a Zinx Bet Account</h2>
-  <form>
-    <input type="text" placeholder="Full Name" required />
-    <input type="email" placeholder="Email" required />
-    <input type="password" placeholder="Password" required />
-    <button type="submit">Sign Up</button>
-  </form>
+  <div class="signup-box">
+    <h2>Create Account</h2>
+    <form id="signup-form">
+      <input type="email" placeholder="Email" required />
+      <input type="password" placeholder="Password" required />
+      <button type="submit">Sign Up</button>
+    </form>
+    <p>Already have an account? <a href="login.html">Login</a></p>
+  </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, doc, setDoc, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCIfDy-disoLf5UTf2AlZno87N1kISHc2Y",
@@ -63,24 +76,34 @@
       projectId: "zinx-bet",
       storageBucket: "zinx-bet.appspot.com",
       messagingSenderId: "701258513012",
-      appId: "1:701258513012:web:ae5340ab5451e45619af21",
-      measurementId: "G-3L1ELY3274"
+      appId: "1:701258513012:web:ae5340ab5451e45619af21"
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    document.querySelector("form").addEventListener("submit", async (e) => {
+    document.getElementById("signup-form").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const email = document.querySelector('input[type="email"]').value;
-      const password = document.querySelector('input[type="password"]').value;
+      const email = e.target[0].value;
+      const password = e.target[1].value;
 
       try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        alert("✅ Signup successful!");
+        const userCred = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCred.user;
+
+        // Set VIP access for 1 day
+        const oneDayLater = Timestamp.fromDate(new Date(Date.now() + 86400000)); // 1 day in ms
+        await setDoc(doc(db, "users", user.uid), {
+          email: user.email,
+          vipUntil: oneDayLater,
+          createdAt: serverTimestamp()
+        });
+
+        alert("✅ Signup successful. You have 1-day VIP access!");
         window.location.href = "login.html";
-      } catch (error) {
-        alert("❌ Error: " + error.message);
+      } catch (err) {
+        alert("❌ Signup error: " + err.message);
       }
     });
   </script>
