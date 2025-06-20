@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Upload Tips</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+    }
+    h1 { color: #FFD700; }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      width: 80%;
+      max-width: 400px;
+      font-size: 16px;
+    }
+    button {
+      background: #FFD700;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Upload VIP Prediction</h1>
+  <input type="text" id="match" placeholder="Match e.g. Arsenal vs Chelsea">
+  <input type="text" id="tip" placeholder="Tip e.g. BTTS or Over 2.5">
+  <button onclick="uploadTip()">Upload</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCIfDy-disoLf5UTf2AlZno87N1kISHc2Y",
+      authDomain: "zinx-bet.firebaseapp.com",
+      projectId: "zinx-bet",
+      storageBucket: "zinx-bet.appspot.com",
+      messagingSenderId: "701258513012",
+      appId: "1:701258513012:web:ae5340ab5451e45619af21",
+      measurementId: "G-3L1ELY3274"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Only allow you (admin) to access
+    onAuthStateChanged(auth, (user) => {
+      if (!user || user.email !== "w24291329@gmail.com") {
+        alert("Access denied!");
+        window.location.href = "login.html";
+      }
+    });
+
+    window.uploadTip = async function () {
+      const match = document.getElementById("match").value.trim();
+      const tip = document.getElementById("tip").value.trim();
+
+      if (!match || !tip) return alert("Fill in both fields!");
+
+      await addDoc(collection(db, "vipTips"), {
+        game: `${match} - ${tip}`,
+        createdAt: serverTimestamp()
+      });
+
+      alert("✅ Tip uploaded!");
+      document.getElementById("match").value = "";
+      document.getElementById("tip").value = "";
+    };
+  </script>
+</body>
+</html>
