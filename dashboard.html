@@ -1,53 +1,59 @@
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCIfDy-disoLf5UTf2AlZno87N1kISHc2Y",
-    authDomain: "zinx-bet.firebaseapp.com",
-    projectId: "zinx-bet",
-    storageBucket: "zinx-bet.appspot.com",
-    messagingSenderId: "701258513012",
-    appId: "1:701258513012:web:ae5340ab5451e45619af21",
-    measurementId: "G-3L1ELY3274"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  // Check if user is logged in
-  onAuthStateChanged(auth, (user) => {
-    if (!user) {
-      // ❌ Not logged in
-      alert("You must login first!");
-      window.location.href = "login.html";
-    } else {
-      // ✅ User is logged in
-      console.log("User logged in:", user.email);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zinx Bet Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #000000, #1a1a1a);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
     }
-  })
-    <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCIfDy-disoLf5UTf2AlZno87N1kISHc2Y",
-    authDomain: "zinx-bet.firebaseapp.com",
-    projectId: "zinx-bet",
-    storageBucket: "zinx-bet.appspot.com",
-    messagingSenderId: "701258513012",
-    appId: "1:701258513012:web:ae5340ab5451e45619af21",
-    measurementId: "G-3L1ELY3274"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  onAuthStateChanged(auth, (user) => {
-    if (!user) {
-      window.location.href = "login.html"; // Not logged in: redirect
-    } else {
-      console.log("✅ Logged in as:", user.email);
+    h1 {
+      color: #FFD700;
     }
-  });
-</script>
+  </style>
+</head>
+<body>
+  <div>
+    <h1>Welcome to Zinx Bet Dashboard</h1>
+    <p>You are logged in successfully ✅</p>
+  </div>
+
+  <!-- Firebase script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCIfDy-disoLf5UTf2AlZno87N1kISHc2Y",
+      authDomain: "zinx-bet.firebaseapp.com",
+      projectId: "zinx-bet",
+      storageBucket: "zinx-bet.appspot.com",
+      messagingSenderId: "701258513012",
+      appId: "1:701258513012:web:ae5340ab5451e45619af21",
+      measurementId: "G-3L1ELY3274"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Redirect to login if user is not logged in
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        console.log("✅ Logged in as:", user.email);
+      }
+    });
+  </script>
+</body>
+</html>
