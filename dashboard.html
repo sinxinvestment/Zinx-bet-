@@ -1,1 +1,29 @@
-<h2>User Dashboard</h2><script src='firebase.js'></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCIfDy-disoLf5UTf2AlZno87N1kISHc2Y",
+    authDomain: "zinx-bet.firebaseapp.com",
+    projectId: "zinx-bet",
+    storageBucket: "zinx-bet.appspot.com",
+    messagingSenderId: "701258513012",
+    appId: "1:701258513012:web:ae5340ab5451e45619af21",
+    measurementId: "G-3L1ELY3274"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // Check if user is logged in
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      // ❌ Not logged in
+      alert("You must login first!");
+      window.location.href = "login.html";
+    } else {
+      // ✅ User is logged in
+      console.log("User logged in:", user.email);
+    }
+  });
+</script>
