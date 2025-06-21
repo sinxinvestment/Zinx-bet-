@@ -1,26 +1,31 @@
-<!-- admin.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin - Upload Tips</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel – Upload VIP Tips</title>
   <style>
     body {
-      font-family: Arial;
-      background-color: #111;
+      background-color: #0e0e0e;
       color: #FFD700;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 30px;
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 1rem;
     }
     input, button {
+      padding: 0.8rem;
       margin: 10px;
-      padding: 12px;
-      font-size: 16px;
       width: 90%;
       max-width: 400px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: none;
+    }
+    input {
+      background: #f0f0f0;
     }
     button {
       background-color: #FFD700;
@@ -31,10 +36,14 @@
   </style>
 </head>
 <body>
-  <h1>Upload VIP Prediction</h1>
-  <input id="match" type="text" placeholder="Match e.g. Arsenal vs Chelsea">
-  <input id="tip" type="text" placeholder="Tip e.g. BTTS or Over 2.5">
-  <button onclick="uploadTip()">Upload</button>
+
+  <h1>📤 Upload VIP Prediction</h1>
+
+  <input type="text" id="match" placeholder="Match (e.g. Arsenal vs Chelsea)" />
+  <input type="text" id="tip" placeholder="Tip (e.g. BTTS, Over 2.5)" />
+  <input type="date" id="matchDate" />
+
+  <button onclick="uploadTip()">Upload Tip</button>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -42,7 +51,7 @@
     import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyCfby-disoL5FUTfA2lZno87NKlSHC2y",
+      apiKey: "AIzaSyCfby-disoL5FUTF2AlZno87NKlSHc2Y",
       authDomain: "zinx-bet.firebaseapp.com",
       projectId: "zinx-bet",
       storageBucket: "zinx-bet.appspot.com",
@@ -54,27 +63,42 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    // ✅ Admin protection
     onAuthStateChanged(auth, (user) => {
       if (!user || !["w24291329@gmail.com", "w34711442@gmail.com"].includes(user.email)) {
-        alert("Access Denied ❌");
+        alert("❌ Access Denied. Only admins allowed.");
         window.location.href = "login.html";
       }
     });
 
+    // ✅ Upload prediction with date
     window.uploadTip = async () => {
       const match = document.getElementById("match").value.trim();
       const tip = document.getElementById("tip").value.trim();
-      if (!match || !tip) return alert("Fill in both fields ❌");
+      const matchDate = document.getElementById("matchDate").value;
 
-      await addDoc(collection(db, "vipTips"), {
-        game: `${match} – ${tip}`,
-        createdAt: serverTimestamp()
-      });
+      if (!match || !tip || !matchDate) {
+        return alert("❗ Please fill in all fields.");
+      }
 
-      alert("✅ Tip uploaded!");
-      document.getElementById("match").value = "";
-      document.getElementById("tip").value = "";
-    }
+      try {
+        await addDoc(collection(db, "vipTips"), {
+          game: `${match} 👉 ${tip}`,
+          date: matchDate,
+          createdAt: serverTimestamp()
+        });
+
+        alert("✅ Prediction uploaded successfully.");
+        document.getElementById("match").value = "";
+        document.getElementById("tip").value = "";
+        document.getElementById("matchDate").value = "";
+
+      } catch (err) {
+        alert("❌ Upload failed. Check console.");
+        console.error(err);
+      }
+    };
   </script>
+
 </body>
 </html>
