@@ -48,21 +48,20 @@
     import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyCfby-disoL5FUTfA2lZno87NKlSHC2y",
-      authDomain: "zinx-bet.firebaseapp.com",
-      projectId: "zinx-bet",
-      storageBucket: "zinx-bet.appspot.com",
-      messagingSenderId: "701258513012",
-      appId: "1:701258513012:web:ae5304ab5451e4619fa2f1",
-      measurementId: "G-3L1ELY3274"
-    };
+  apiKey: "AIzaSyCfby-disoL5FUTfA2lZno87NKlSHC2y",
+  authDomain: "zinx-bet.firebaseapp.com",
+  projectId: "zinx-bet",
+  storageBucket: "zinx-bet.appspot.com",
+  messagingSenderId: "701258513012",
+  appId: "1:701258513012:web:ae5304ab5451e4619fa2f1",
+  measurementId: "G-3L1ELY3274"
+};
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-    const form = document.getElementById("signup-form");
-
+const form = document.getElementById("signup-form");
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const email = form[0].value;
