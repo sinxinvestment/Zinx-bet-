@@ -1,33 +1,26 @@
+<!-- login.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Zinx Bet Login</title>
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #000000, #1a1a1a);
-      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #000000, #111111);
+      color: #FFD700;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
+      text-align: center;
     }
-    h2 {
-      color: #FFD700;
-    }
-    form {
-      display: flex;
-      flex-direction: column;
-      width: 90%;
-      max-width: 320px;
-    }
-    input {
-      margin: 10px 0;
+    input, button {
       padding: 12px;
+      margin: 10px;
       font-size: 16px;
       border-radius: 5px;
       border: none;
@@ -35,51 +28,45 @@
     button {
       background-color: #FFD700;
       color: black;
-      padding: 12px;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px;
+      font-weight: bold;
       cursor: pointer;
-      margin-top: 10px;
     }
   </style>
 </head>
 <body>
   <h2>Login to Zinx Bet</h2>
-  <form>
-    <input type="email" placeholder="Email Address" required>
-    <input type="password" placeholder="Password" required>
+  <form id="login-form">
+    <input type="email" placeholder="Email" required />
+    <input type="password" placeholder="Password" required />
     <button type="submit">Login</button>
-  </form><script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  </form>
+  <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyCIfDy-disoLf5UTf2AlZno87N1kISHc2Y",
-    authDomain: "zinx-bet.firebaseapp.com",
-    projectId: "zinx-bet",
-    storageBucket: "zinx-bet.appspot.com",
-    messagingSenderId: "701258513012",
-    appId: "1:701258513012:web:ae5340ab5451e45619af21",
-    measurementId: "G-3L1ELY3274"
-  };
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+    const firebaseConfig = {
+      apiKey: "AIzaSyCfby-disoL5FUTfA2lZno87NKlSHC2y",
+      authDomain: "zinx-bet.firebaseapp.com",
+      projectId: "zinx-bet"
+    };
 
-  document.querySelector("form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.querySelector('input[type="email"]').value;
-    const password = document.querySelector('input[type="password"]').value;
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      alert("✅ Login successful!");
-      window.location.href = "dashboard.html"; // 🔁 Redirect to your dashboard page
-    } catch (error) {
-      alert("❌ Login Error: " + error.message);
-    }
-  });
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = e.target[0].value;
+      const password = e.target[1].value;
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        window.location.href = "dashboard.html";
+      } catch (err) {
+        alert("❌ Login error: " + err.message);
+      }
+    });
   </script>
 </body>
 </html>
