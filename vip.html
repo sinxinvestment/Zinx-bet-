@@ -1,1 +1,107 @@
-<h2>VIP Access</h2><a href='https://paystack.com/pay/example'>Pay with Paystack</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VIP Tips - Zinx Bet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    body {
+      background: #111;
+      color: #FFD700;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+      text-align: center;
+    }
+    ul { padding-left: 20px; text-align: left; }
+    section {
+      background: #1c1c1c;
+      padding: 15px;
+      margin: 10px auto;
+      border-radius: 10px;
+      max-width: 600px;
+    }
+    .logout {
+      background: crimson;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin-top: 20px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔐 VIP Tips</h1>
+  <section>
+    <h2>Upcoming Predictions</h2>
+    <ul id="upcomingList"><li>Loading...</li></ul>
+  </section>
+
+  <section>
+    <h2>Previous Predictions</h2>
+    <ul id="pastList"><li>Loading...</li></ul>
+  </section>
+
+  <button class="logout" onclick="logout()">Logout</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore, doc, getDoc, collection, getDocs
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCfby-disoL5FUTfA2lZno87NKlSHC2y",
+      authDomain: "zinx-bet.firebaseapp.com",
+      projectId: "zinx-bet",
+      storageBucket: "zinx-bet.appspot.com",
+      messagingSenderId: "701258513012",
+      appId: "1:701258513012:web:ae5304ab5451e4619fa2f1",
+      measurementId: "G-3L1ELY3274"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const today = new Date().toISOString().split("T")[0];
+    const upcomingList = document.getElementById("upcomingList");
+    const pastList = document.getElementById("pastList");
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return (window.location.href = "login.html");
+
+      const ref = doc(db, "users", user.uid);
+      const snap = await getDoc(ref);
+      const data = snap.exists() ? snap.data() : {};
+      const now = Date.now();
+      const vipUntil = data.vipUntil?.toMillis?.() ?? data.vipUntil ?? 0;
+
+      if (vipUntil < now) {
+        alert("❌ VIP access expired. Please subscribe.");
+        window.location.href = "dashboard.html";
+        return;
+      }
+
+      const tipSnap = await getDocs(collection(db, "vipTips"));
+      let upcomingHTML = "", pastHTML = "";
+
+      tipSnap.forEach((doc) => {
+        const tip = doc.data();
+        if (tip.matchDate === today || tip.matchDate > today) {
+          upcomingHTML += `<li>${tip.matchDate} — ${tip.game}</li>`;
+        } else {
+          pastHTML += `<li>${tip.matchDate} — ${tip.game}</li>`;
+        }
+      });
+
+      upcomingList.innerHTML = upcomingHTML || "<li>No upcoming tips.</li>";
+      pastList.innerHTML = pastHTML || "<li>No previous tips yet.</li>";
+    });
+
+    window.logout = () => signOut(auth);
+  </script>
+</body>
+</html>
