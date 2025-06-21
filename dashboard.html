@@ -11,170 +11,176 @@
       background: linear-gradient(135deg, #000000, #111111);
       color: #FFD700;
       font-family: 'Segoe UI', sans-serif;
-    }
-    h1, h2 {
       text-align: center;
     }
-    section {
-      background: #1c1c1c;
-      padding: 15px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-    }
+    section { background: #1c1c1c; padding: 15px; border-radius: 10px; margin: 10px auto; max-width: 600px; }
     ul { padding-left: 20px; }
     button {
       background: #FFD700;
       color: black;
-      font-weight: bold;
       padding: 10px 20px;
+      font-weight: bold;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       cursor: pointer;
     }
-    .logout {
-      background: crimson;
-      color: white;
-    }
-    a {
-      color: #FFD700;
-    }
+    .logout { background: crimson; color: white; margin-top: 20px; }
   </style>
 </head>
 <body>
-  <h1>Welcome to Zinx Bet Dashboard</h1>
 
-  <section>
-    <h2>🔥 Free Daily Predictions</h2>
-    <ul id="freeList">
-      <li>Loading...</li>
-    </ul>
-  </section>
+<h1>🔥 Welcome to Zinx Bet Dashboard</h1>
 
-  <section id="vipSection" style="display:none;">
-    <h2>👑 VIP Tips</h2>
-    <ul id="vipList"><li>Loading...</li></ul>
-    <p id="vipExpires"></p>
-  </section>
+<section>
+  <h2>🔥 Free Daily Predictions</h2>
+  <ul id="freeList"><li>Loading...</li></ul>
+</section>
 
-  <section id="paySection" style="text-align:center;">
-    <button id="payBtn">Subscribe to VIP (₦5000)</button>
-  </section>
+<section id="vipSection" style="display:none;">
+  <h2>👑 VIP Tips</h2>
+  <ul id="vipList"><li>Loading...</li></ul>
+  <p id="vipExpires"></p>
+</section>
 
-  <section>
-    <h2>📨 Your Referral Link</h2>
-    <p id="referralLink">Generating...</p>
-    <p>Share to earn bonus when friends pay for VIP.</p>
-  </section>
+<section id="paySection" style="text-align:center;">
+  <button id="payBtn">Subscribe to VIP (₦5000)</button>
+</section>
 
-  <section>
-    <h2>💬 VIP Group Chat</h2>
-    <p><a href="https://chat.whatsapp.com/YOUR-VIP-GROUP-LINK" target="_blank">Join our VIP WhatsApp group</a></p>
-  </section>
+<section>
+  <h2>➤ Your Referral Link</h2>
+  <p id="referralLink">Generating...</p>
+  <p>💰 Share this link to earn bonus when friends pay for VIP.</p>
+</section>
 
-  <section>
-    <h2>📞 Contact Support</h2>
-    <p><a href="https://wa.me/2348108705034" target="_blank">WhatsApp: 08108705034</a></p>
-  </section>
+<section>
+  <h2>📲 VIP Group Chat</h2>
+  <p><a href="https://chat.whatsapp.com/YOUR-VIP-GROUP-LINK" target="_blank">Join VIP WhatsApp Group</a></p>
+</section>
 
-  <section style="text-align:center;">
-    <button class="logout" id="logoutBtn">Logout</button>
-  </section>
+<section>
+  <h2>🛟 Contact Support</h2>
+  <p><a href="https://wa.me/2348108705034" target="_blank">WhatsApp: 08108705034</a></p>
+</section>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, getDoc, setDoc, doc, collection, getDocs, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+<button class="logout" id="logoutBtn">Logout</button>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCIfDy-disoLf5UTf2AlZno87N1kISHc2Y",
-      authDomain: "zinx-bet.firebaseapp.com",
-      projectId: "zinx-bet",
-      storageBucket: "zinx-bet.appspot.com",
-      messagingSenderId: "701258513012",
-      appId: "1:701258513012:web:ae5340ab5451e45619af21",
-      measurementId: "G-3L1ELY3274"
-    };
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    getFirestore, doc, getDoc, collection, getDocs, setDoc, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+  const firebaseConfig = {
+    apiKey: "AIzaSyCfby-disoL5FUTfA2lZno87NKlSHC2y",
+    authDomain: "zinx-bet.firebaseapp.com",
+    projectId: "zinx-bet",
+    storageBucket: "zinx-bet.appspot.com",
+    messagingSenderId: "701258513012",
+    appId: "1:701258513012:web:ae5304ab5451e4619fa2f1",
+    measurementId: "G-3L1ELY3274"
+  };
 
-    const vipSection = document.getElementById("vipSection");
-    const vipList = document.getElementById("vipList");
-    const freeList = document.getElementById("freeList");
-    const payBtn = document.getElementById("payBtn");
-    const vipExpires = document.getElementById("vipExpires");
-    const referralLink = document.getElementById("referralLink");
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-    const fmt = ms => new Date(ms).toLocaleDateString("en-NG", { year: "numeric", month: "short", day: "numeric" });
+  const vipSection = document.getElementById("vipSection");
+  const payBtn = document.getElementById("payBtn");
+  const vipExpires = document.getElementById("vipExpires");
+  const freeList = document.getElementById("freeList");
+  const vipList = document.getElementById("vipList");
+  const referralLink = document.getElementById("referralLink");
 
-    async function loadPredictions() {
-      // Simulated free tips
-      freeList.innerHTML = `
-        <li>Arsenal vs Chelsea — BTTS</li>
-        <li>Real Madrid to win</li>
-        <li>Over 2.5 ⚽ (Bayern-Dortmund)</li>
-      `;
+  const fmt = (ms) => new Date(ms).toLocaleDateString("en-NG", {
+    year: "numeric", month: "short", day: "numeric"
+  });
 
-      // VIP Tips (from Firestore)
-      const snap = await getDocs(collection(db, "vipTips"));
-      let html = "";
-      snap.forEach(d => {
-        html += `<li>${d.data().game}</li>`;
-      });
-      vipList.innerHTML = html || "<li>No VIP tips uploaded yet.</li>";
+  const today = new Date().toISOString().split("T")[0]; // e.g. 2025-06-22
+
+  async function loadPredictions() {
+    // Load free predictions (static or later from Firestore)
+    freeList.innerHTML = `
+      <li>Arsenal vs Chelsea — BTTS</li>
+      <li>Real Madrid to win</li>
+      <li>Over 2.5 ⚽ (Bayern-Dortmund)</li>
+    `;
+
+    // Load VIP predictions for today only
+    const snap = await getDocs(collection(db, "vipTips"));
+    let html = "";
+    snap.forEach(d => {
+      const tip = d.data();
+      if (tip.matchDate === today) {
+        html += `<li>${tip.game}</li>`;
+      }
+    });
+    vipList.innerHTML = html || "<li>No VIP tips uploaded for today yet.</li>";
+  }
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "login.html";
+      return;
     }
 
-    onAuthStateChanged(auth, async user => {
-      if (!user) return (window.location.href = "login.html");
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
+    const data = snap.exists() ? snap.data() : {};
 
-      const ref = doc(db, "users", user.uid);
-      const snap = await getDoc(ref);
-      const data = snap.exists() ? snap.data() : {};
+    // VIP check
+    const now = Date.now();
+    const vipUntil = data.vipUntil ? data.vipUntil.toMillis?.() ?? data.vipUntil : 0;
 
-      const now = Date.now();
-      const vipUntil = data.vipUntil?.toMillis?.() ?? data.vipUntil ?? 0;
+    if (vipUntil > now) {
+      vipSection.style.display = "block";
+      payBtn.style.display = "none";
+      vipExpires.textContent = `✅ VIP active until: ${fmt(vipUntil)}`;
+    } else {
+      vipSection.style.display = "none";
+      payBtn.style.display = "block";
+    }
 
-      referralLink.textContent = `${window.location.origin}/signup.html?ref=${user.uid}`;
+    // Show referral link
+    const refURL = `${location.origin}/signup.html?ref=${user.uid}`;
+    referralLink.textContent = refURL;
+    referralLink.onclick = () => navigator.clipboard.writeText(refURL);
 
-      if (vipUntil > now) {
+    loadPredictions();
+  });
+
+  // Paystack Payment
+  payBtn.addEventListener("click", () => {
+    const handler = PaystackPop.setup({
+      key: "pk_live_50ff994381978361b91b5771510183d439bc71fd", // Your public key
+      email: auth.currentUser.email,
+      amount: 5000 * 100,
+      currency: "NGN",
+      callback: async (response) => {
+        const thirtyDays = 30 * 24 * 60 * 60 * 1000;
+        const vipUntil = Date.now() + thirtyDays;
+
+        await setDoc(doc(db, "users", auth.currentUser.uid), {
+          vipUntil,
+          lastPayment: serverTimestamp()
+        }, { merge: true });
+
+        alert("🎉 Payment successful — VIP activated!");
         vipSection.style.display = "block";
         payBtn.style.display = "none";
-        vipExpires.textContent = `VIP active until: ${fmt(vipUntil)}`;
-      } else {
-        vipSection.style.display = "none";
-        payBtn.style.display = "block";
-      }
-
-      loadPredictions();
+        vipExpires.textContent = `✅ VIP active until: ${fmt(vipUntil)}`;
+        loadPredictions();
+      },
+      onClose: () => alert("❌ Payment closed."),
     });
+    handler.openIframe();
+  });
 
-    payBtn.addEventListener("click", () => {
-      const handler = PaystackPop.setup({
-        key: "pk_live_50ff994381978361b91b5771510183d439bc71fd",
-        email: auth.currentUser.email,
-        amount: 5000 * 100,
-        currency: "NGN",
-        callback: async function(response) {
-          const vipUntil = Date.now() + 30 * 24 * 60 * 60 * 1000;
-          await setDoc(doc(db, "users", auth.currentUser.uid), {
-            vipUntil,
-            lastPayment: serverTimestamp(),
-          }, { merge: true });
+  // Logout
+  document.getElementById("logoutBtn").onclick = () => signOut(auth);
+</script>
 
-          alert("🎉 Payment successful — VIP unlocked!");
-          vipSection.style.display = "block";
-          payBtn.style.display = "none";
-          vipExpires.textContent = `VIP active until: ${fmt(vipUntil)}`;
-          loadPredictions();
-        },
-        onClose: () => alert("❌ Payment window closed"),
-      });
-      handler.openIframe();
-    });
-
-    document.getElementById("logoutBtn").onclick = () => signOut(auth);
-  </script>
-  <script src="https://js.paystack.co/v1/inline.js"></script>
+<!-- Load Paystack -->
+<script src="https://js.paystack.co/v1/inline.js"></script>
 </body>
 </html>
