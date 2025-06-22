@@ -2,103 +2,115 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Panel – Upload VIP Tips</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zinx Bet – Admin Upload</title>
   <style>
     body {
-      background-color: #0e0e0e;
-      color: #FFD700;
+      background: #0d0d0d;
+      color: #ffd700;
       font-family: Arial, sans-serif;
       padding: 2rem;
-      text-align: center;
     }
-    h1 {
-      margin-bottom: 1rem;
+    h2 { text-align: center; }
+    form {
+      max-width: 500px;
+      margin: auto;
+      display: grid;
+      gap: 1rem;
+      background: #1a1a1a;
+      padding: 1.5rem;
+      border-radius: 10px;
     }
-    input, button {
+    input, select, button {
       padding: 0.8rem;
-      margin: 10px;
-      width: 90%;
-      max-width: 400px;
-      font-size: 16px;
-      border-radius: 5px;
       border: none;
+      border-radius: 6px;
+      font-size: 16px;
     }
-    input {
-      background: #f0f0f0;
+    input, select {
+      background: #fff;
     }
     button {
-      background-color: #FFD700;
-      color: black;
+      background: #ffd700;
       font-weight: bold;
       cursor: pointer;
+    }
+    .back {
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+    .back a {
+      color: #fff;
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
+  <h2>🔐 Admin Panel – Upload Prediction</h2>
+  <form id="upload-form">
+    <input type="text" id="team1" placeholder="Team 1" required />
+    <input type="text" id="team2" placeholder="Team 2" required />
+    <input type="text" id="tip" placeholder="Prediction Tip" required />
+    <input type="date" id="date" required />
+    <select id="vip">
+      <option value="false">Free Tip</option>
+      <option value="true">VIP Tip</option>
+    </select>
+    <button type="submit">Upload</button>
+  </form>
 
-  <h1>📤 Upload VIP Prediction</h1>
-
-  <input type="text" id="match" placeholder="Match (e.g. Arsenal vs Chelsea)" />
-  <input type="text" id="tip" placeholder="Tip (e.g. BTTS, Over 2.5)" />
-  <input type="date" id="matchDate" />
-
-  <button onclick="uploadTip()">Upload Tip</button>
+  <div class="back">
+    <a href="dashboard.html">← Back to Dashboard</a>
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyCfby-disoL5FUTF2AlZno87NKlSHc2Y",
+      apiKey: "AIzaSyCfby-disoL5FUTfA2lZno87NKlSHC2y",
       authDomain: "zinx-bet.firebaseapp.com",
       projectId: "zinx-bet",
       storageBucket: "zinx-bet.appspot.com",
       messagingSenderId: "701258513012",
-      appId: "1:701258513012:web:ae5304ab5451e4619fa2f1"
+      appId: "1:701258513012:web:ae5304ab5451e4619fa2f1",
+      measurementId: "G-3L1ELY3274"
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // ✅ Admin protection
-    onAuthStateChanged(auth, (user) => {
-      if (!user || !["w24291329@gmail.com", "w34711442@gmail.com"].includes(user.email)) {
-        alert("❌ Access Denied. Only admins allowed.");
+    onAuthStateChanged(auth, user => {
+      if (!user || user.email !== "w34711442@gmail.com") {
+        alert("Access Denied: Admins only");
         window.location.href = "login.html";
       }
     });
 
-    // ✅ Upload prediction with date
-    window.uploadTip = async () => {
-      const match = document.getElementById("match").value.trim();
-      const tip = document.getElementById("tip").value.trim();
-      const matchDate = document.getElementById("matchDate").value;
+    const form = document.getElementById("upload-form");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-      if (!match || !tip || !matchDate) {
-        return alert("❗ Please fill in all fields.");
-      }
+      const team1 = document.getElementById("team1").value.trim();
+      const team2 = document.getElementById("team2").value.trim();
+      const tip   = document.getElementById("tip").value.trim();
+      const date  = document.getElementById("date").value;
+      const vip   = document.getElementById("vip").value === "true";
 
       try {
-        await addDoc(collection(db, "vipTips"), {
-          game: `${match} 👉 ${tip}`,
-          date: matchDate,
-          createdAt: serverTimestamp()
+        await addDoc(collection(db, "predictions"), {
+          team1, team2, tip, date, vip,
+          timestamp: new Date().toISOString()
         });
 
-        alert("✅ Prediction uploaded successfully.");
-        document.getElementById("match").value = "";
-        document.getElementById("tip").value = "";
-        document.getElementById("matchDate").value = "";
-
+        alert("✅ Prediction uploaded!");
+        form.reset();
       } catch (err) {
-        alert("❌ Upload failed. Check console.");
-        console.error(err);
+        alert("❌ Upload error: " + err.message);
       }
-    };
+    });
   </script>
-
 </body>
 </html>
