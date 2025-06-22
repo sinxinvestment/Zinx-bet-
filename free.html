@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Free Tips – Zinx Bet</title>
+  <style>
+    body {
+      background: #0d0d0d;
+      color: #ffd700;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 2rem;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .match-card {
+      background: #1e1e1e;
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+    }
+    .match-card h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: #fff;
+    }
+    .match-card .tip {
+      color: #ffd700;
+      font-weight: bold;
+    }
+    .note {
+      text-align: center;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <h2>⚽ Free Predictions</h2>
+  <div id="predictions-list">
+    <p>Loading predictions...</p>
+  </div>
+
+  <div class="note">
+    <p>Want more accurate and daily tips? <a href="vip.html" style="color:#ffd700;">Go VIP 🔐</a></p>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCfby-disoL5FUTfA2lZno87NKlSHC2y",
+      authDomain: "zinx-bet.firebaseapp.com",
+      projectId: "zinx-bet",
+      storageBucket: "zinx-bet.appspot.com",
+      messagingSenderId: "701258513012",
+      appId: "1:701258513012:web:ae5304ab5451e4619fa2f1",
+      measurementId: "G-3L1ELY3274"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const container = document.getElementById("predictions-list");
+
+    async function fetchFreeTips() {
+      const q = query(collection(db, "predictions"), where("vip", "==", false), orderBy("date"));
+      const snapshot = await getDocs(q);
+
+      container.innerHTML = "";
+
+      if (snapshot.empty) {
+        container.innerHTML = "<p>No free tips available right now.</p>";
+        return;
+      }
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const card = document.createElement("div");
+        card.className = "match-card";
+        card.innerHTML = `
+          <h3>${data.team1} vs ${data.team2}</h3>
+          <p class="tip">Tip: ${data.tip}</p>
+          <p>Date: ${data.date}</p>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    fetchFreeTips();
+  </script>
+</body>
+</html>
