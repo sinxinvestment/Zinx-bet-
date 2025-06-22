@@ -1,72 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Zinx Bet Dashboard</title>
   <style>
     body {
-      margin: 0;
-      padding: 2rem;
-      background: #0e0e0e;
-      color: #ffd700;
+      background-color: #0d0d0d;
+      color: #fff;
       font-family: 'Segoe UI', sans-serif;
-    }
-    h2 { text-align: center; }
-    .section { margin-top: 2rem; }
-    .tips { display: grid; gap: 1rem; margin-top: 1rem; }
-    .tip {
-      background: #1a1a1a;
       padding: 1rem;
-      border-left: 5px solid #ffd700;
-      border-radius: 6px;
     }
-    .vip { border-left-color: #00ffae; }
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    h1 {
+      color: #ffd700;
+    }
+    .section {
+      background: #1a1a1a;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+    }
     button {
       background: #ffd700;
-      border: none;
+      color: #000;
       padding: 0.7rem 1.2rem;
-      font-weight: bold;
+      border: none;
+      border-radius: 5px;
       cursor: pointer;
-      border-radius: 4px;
+    }
+    .vip-section {
       margin-top: 1rem;
     }
-    .logout {
-      float: right;
-      background: #ff4b4b;
-      color: white;
-    }
-    .admin-panel {
-      display: none;
-      margin-top: 2rem;
-      text-align: center;
+    a {
+      color: #ffd700;
     }
   </style>
 </head>
 <body>
 
-  <h2>Welcome to Zinx Bet 🎯</h2>
-  <button class="logout" onclick="logout()">Logout</button>
+  <header>
+    <h1>Zinx Bet Dashboard</h1>
+    <p id="user-email">Loading...</p>
+  </header>
 
   <div class="section">
-    <h3>🔓 Free Predictions</h3>
-    <div id="free-tips" class="tips"></div>
+    <h2>Your VIP Status:</h2>
+    <p id="vip-status">Checking...</p>
+    <button onclick="subscribe()">Subscribe to VIP</button>
   </div>
 
   <div class="section">
-    <h3>🌟 VIP Predictions</h3>
-    <div id="vip-tips" class="tips"></div>
+    <h2>Prediction Access</h2>
+    <p>View <a href="vip.html">VIP Predictions</a></p>
+    <p>Or enjoy your <strong>1-day free access</strong> if you're new!</p>
   </div>
 
-  <div class="admin-panel" id="admin-panel">
-    <h3>👑 Admin Controls</h3>
-    <button onclick="window.location.href='admin.html'">Go to Admin Panel</button>
+  <div class="section">
+    <h2>Referral</h2>
+    <p>Share your referral link:</p>
+    <p id="ref-link"></p>
+  </div>
+
+  <div class="section">
+    <button onclick="logout()">Logout</button>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCfby-disoL5FUTfA2lZno87NKlSHC2y",
@@ -74,17 +81,28 @@
       projectId: "zinx-bet",
       storageBucket: "zinx-bet.appspot.com",
       messagingSenderId: "701258513012",
-      appId: "1:701258513012:web:ae5304ab5451e4619fa2f1",
-      measurementId: "G-3L1ELY3274"
+      appId: "1:701258513012:web:ae5304ab5451e4619fa2f1"
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const freeTipsEl = document.getElementById("free-tips");
-    const vipTipsEl = document.getElementById("vip-tips");
-    const adminPanel = document.getElementById("admin-panel");
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        document.getElementById('user-email').innerText = `Logged in as: ${user.email}`;
+        const refLink = `https://zinx-bet.onrender.com/signup.html?ref=${user.uid}`;
+        document.getElementById("ref-link").innerText = refLink;
+
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+        const isVIP = docSnap.exists() && docSnap.data().isVIP;
+
+        document.getElementById('vip-status').innerText = isVIP ? "Active ✅" : "Not Subscribed ❌";
+      } else {
+        window.location.href = "login.html";
+      }
+    });
 
     function logout() {
       signOut(auth).then(() => {
@@ -92,48 +110,9 @@
       });
     }
 
-    function renderTip(el, match, vip = false) {
-      const div = document.createElement("div");
-      div.className = "tip" + (vip ? " vip" : "");
-      div.innerHTML = `
-        <strong>${match.team1} vs ${match.team2}</strong><br>
-        Tip: ${match.tip}<br>
-        Date: ${match.date}
-      `;
-      el.appendChild(div);
+    function subscribe() {
+      window.location.href = "https://paystack.com/pay/wg8hw8juzq"; // Replace with your Paystack link
     }
-
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        window.location.href = "login.html";
-        return;
-      }
-
-      // Show admin panel if admin email
-      if (user.email === "w34711442@gmail.com") {
-        adminPanel.style.display = "block";
-      }
-
-      const tipsRef = collection(db, "predictions");
-
-      // Free tips (only 3)
-      const freeQuery = query(tipsRef, where("vip", "==", false));
-      const freeSnap = await getDocs(freeQuery);
-      let count = 0;
-      freeSnap.forEach(doc => {
-        if (count < 3) {
-          renderTip(freeTipsEl, doc.data(), false);
-          count++;
-        }
-      });
-
-      // VIP tips (show all)
-      const vipQuery = query(tipsRef, where("vip", "==", true));
-      const vipSnap = await getDocs(vipQuery);
-      vipSnap.forEach(doc => {
-        renderTip(vipTipsEl, doc.data(), true);
-      });
-    });
   </script>
 </body>
 </html>
