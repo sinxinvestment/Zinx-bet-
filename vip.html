@@ -1,118 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VIP Predictions – Zinx Bet</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VIP Predictions</title>
   <style>
     body {
-      background: #0d0d0d;
+      background-color: #0d0d0d;
       color: #ffd700;
       font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 2rem;
+      padding: 1rem;
     }
     h2 {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-    .match-card {
-      background: #1e1e1e;
-      padding: 1rem;
-      border-radius: 10px;
-      margin-bottom: 1rem;
-      box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
-    }
-    .match-card h3 {
-      margin: 0;
-      font-size: 1.1rem;
       color: #fff;
     }
-    .match-card .tip {
-      color: #ffd700;
-      font-weight: bold;
-    }
-    .logout {
-      text-align: center;
-      margin-top: 2rem;
-    }
-    .logout button {
-      background: #ffd700;
-      border: none;
-      padding: 0.7rem 1.5rem;
-      font-size: 1rem;
-      border-radius: 5px;
-      cursor: pointer;
+    .match {
+      background: #1a1a1a;
+      padding: 1rem;
+      border-radius: 10px;
+      margin: 1rem 0;
     }
   </style>
 </head>
 <body>
-  <h2>🔥 VIP Predictions</h2>
-  <div id="predictions-list">
-    <p>Loading predictions...</p>
-  </div>
-
-  <div class="logout">
-    <button onclick="logout()">Logout</button>
-  </div>
+  <h2>VIP Predictions</h2>
+  <div id="predictions">Loading...</div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, collection, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyCfby-disoL5FUTfA2lZno87NKlSHC2y",
       authDomain: "zinx-bet.firebaseapp.com",
       projectId: "zinx-bet",
       storageBucket: "zinx-bet.appspot.com",
       messagingSenderId: "701258513012",
-      appId: "1:701258513012:web:ae5304ab5451e4619fa2f1",
-      measurementId: "G-3L1ELY3274"
+      appId: "1:701258513012:web:ae5304ab5451e4619fa2f1"
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Handle VIP predictions
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        alert("Please log in to view VIP tips.");
         window.location.href = "login.html";
         return;
       }
 
-      const q = query(collection(db, "predictions"), where("vip", "==", true), orderBy("date"));
-      const querySnapshot = await getDocs(q);
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+      const isVIP = userSnap.exists() && userSnap.data().isVIP;
 
-      const container = document.getElementById("predictions-list");
-      container.innerHTML = "";
+      const container = document.getElementById("predictions");
 
-      if (querySnapshot.empty) {
-        container.innerHTML = "<p>No VIP tips available.</p>";
+      if (!isVIP) {
+        container.innerHTML = "<p>You're not a VIP member. <a href='dashboard.html'>Go back</a></p>";
         return;
       }
 
-      querySnapshot.forEach((doc) => {
+      const matchesSnap = await getDocs(collection(db, "predictions"));
+      container.innerHTML = "";
+      matchesSnap.forEach(doc => {
         const data = doc.data();
-        const card = document.createElement("div");
-        card.className = "match-card";
-        card.innerHTML = `
-          <h3>${data.team1} vs ${data.team2}</h3>
-          <p class="tip">Tip: ${data.tip}</p>
-          <p>Date: ${data.date}</p>
+        container.innerHTML += `
+          <div class="match">
+            <strong>${data.match}</strong><br>
+            Tip: ${data.tip}<br>
+            Odds: ${data.odds}
+          </div>
         `;
-        container.appendChild(card);
       });
     });
-
-    window.logout = function () {
-      signOut(auth).then(() => {
-        window.location.href = "login.html";
-      });
-    };
   </script>
 </body>
 </html>
