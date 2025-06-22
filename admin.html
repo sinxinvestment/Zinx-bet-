@@ -1,80 +1,97 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Admin Upload</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Zinx Admin Panel</title>
   <style>
-    body {
-      background-color: #0d0d0d;
-      color: #ffd700;
-      font-family: Arial, sans-serif;
-      padding: 2rem;
-    }
-    input, button {
-      display: block;
-      margin: 1rem 0;
-      padding: 0.7rem;
-      width: 100%;
-      border-radius: 5px;
-      border: none;
-    }
-    button {
-      background-color: #ffd700;
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-    }
+    body { background: #0d0d0d; color: #fff; font-family: Arial, sans-serif; padding: 2rem; }
+    h1 { color: gold; text-align: center; }
+    form, .controls { background: #1a1a1a; padding: 1rem; border-radius: 8px; max-width: 500px; margin: 1rem auto; }
+    label, input, textarea, select { display: block; width: 100%; margin: 0.5rem 0; }
+    input, textarea, select { padding: 0.7rem; border-radius: 4px; border: none; }
+    button { background: gold; color: #000; font-weight: bold; padding: 0.7rem; border: none; width: 100%; border-radius: 5px; margin-top: 1rem; }
+    .logout { margin-top: 2rem; text-align: center; }
   </style>
 </head>
 <body>
-  <h2>Upload VIP Prediction</h2>
-  <form id="upload-form">
-    <input type="text" id="match" placeholder="Team vs Team" required>
-    <input type="text" id="tip" placeholder="Tip e.g. Over 2.5" required>
-    <input type="text" id="odds" placeholder="Odds" required>
-    <button type="submit">Upload</button>
+  <h1>Admin Prediction Upload</h1>
+
+  <form id="uploadForm">
+    <label for="match">Match</label>
+    <input id="match" type="text" placeholder="e.g., Man Utd vs Chelsea" required>
+
+    <label for="tip">Prediction Tip</label>
+    <input id="tip" type="text" placeholder="e.g., Over 2.5" required>
+
+    <label for="type">Type</label>
+    <select id="type">
+      <option value="free">Free</option>
+      <option value="vip">VIP</option>
+    </select>
+
+    <label for="date">Scheduled Date</label>
+    <input id="date" type="date" required>
+
+    <button type="submit">Upload Prediction</button>
   </form>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  <div class="logout">
+    <button onclick="logout()">Logout</button>
+  </div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCfby-disoL5FUTfA2lZno87NKlSHC2y",
-      authDomain: "zinx-bet.firebaseapp.com",
-      projectId: "zinx-bet",
-      storageBucket: "zinx-bet.appspot.com",
-      messagingSenderId: "701258513012",
-      appId: "1:701258513012:web:ae5304ab5451e4619fa2f1"
-    };
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
+  const firebaseConfig = {
+    apiKey: "AIzaSyCfby-disoL5FUTfA2lZno87NKlSHC2y",
+    authDomain: "zinx-bet.firebaseapp.com",
+    projectId: "zinx-bet",
+    storageBucket: "zinx-bet.appspot.com",
+    messagingSenderId: "701258513012",
+    appId: "1:701258513012:web:ae5304ab5451e4619fa2f1",
+    measurementId: "G-3L1ELY3274"
+  };
 
-    onAuthStateChanged(auth, (user) => {
-      if (!user || user.email !== "w34711442@gmail.com") {
-        alert("Not authorized");
-        window.location.href = "login.html";
-      }
-    });
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
 
-    document.getElementById("upload-form").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const match = document.getElementById("match").value;
-      const tip = document.getElementById("tip").value;
-      const odds = document.getElementById("odds").value;
+  // Admin Access Only (your email)
+  const allowedAdminEmail = "w34711442@gmail.com";
 
+  onAuthStateChanged(auth, user => {
+    if (!user || user.email !== allowedAdminEmail) {
+      alert("Access denied!");
+      window.location.href = "login.html";
+    }
+  });
+
+  document.getElementById("uploadForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const match = document.getElementById("match").value;
+    const tip   = document.getElementById("tip").value;
+    const type  = document.getElementById("type").value;
+    const date  = document.getElementById("date").value;
+
+    try {
       await addDoc(collection(db, "predictions"), {
-        match,
-        tip,
-        odds,
-        timestamp: Date.now()
+        match, tip, type, date, createdAt: serverTimestamp()
       });
+      alert("Prediction uploaded!");
+      e.target.reset();
+    } catch (err) {
+      alert("Upload failed: " + err.message);
+    }
+  });
 
-      alert("Prediction uploaded successfully!");
-      document.getElementById("upload-form").reset();
+  function logout() {
+    signOut(auth).then(() => {
+      window.location.href = "login.html";
     });
-  </script>
+  }
+</script>
 </body>
 </html>
