@@ -1,124 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Zinx Bet – Sign Up</title>
   <style>
-    body {
-      background-color: #0d0d0d;
-      color: #ffd700;
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .container {
-      background: #1a1a1a;
-      padding: 2rem;
-      border-radius: 10px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
-    }
-    h2 {
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-    input {
-      width: 100%;
-      padding: 0.8rem;
-      margin: 0.5rem 0;
-      border-radius: 5px;
-      border: none;
-    }
-    button {
-      width: 100%;
-      padding: 0.8rem;
-      background-color: #ffd700;
-      color: #000;
-      border: none;
-      font-weight: bold;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 1rem;
-    }
-    .link {
-      text-align: center;
-      margin-top: 1rem;
-      color: #aaa;
-    }
-    .link a {
-      color: #ffd700;
-      text-decoration: none;
-    }
+    body{background:#0d0d0d;color:#ffd700;font-family:Segoe UI,Arial,sans-serif;
+      display:flex;justify-content:center;align-items:center;height:100vh;margin:0}
+    .card{background:#1a1a1a;padding:2rem;border-radius:10px;max-width:400px;width:90%;box-shadow:0 0 12px rgba(255,215,0,.3)}
+    h2{text-align:center;margin-bottom:1rem}
+    input,button{width:100%;padding:.8rem;margin:.4rem 0;border:none;border-radius:5px}
+    input{background:#fff}
+    button{background:#ffd700;color:#000;font-weight:bold;cursor:pointer}
+    .link{text-align:center;margin-top:.8rem}
+    a{color:#ffd700;text-decoration:none}
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="card">
     <h2>Create Account</h2>
-    <form id="signup-form">
-      <input type="email" id="email" placeholder="Email" required />
-      <input type="password" id="password" placeholder="Password" required />
-      <input type="password" id="confirm" placeholder="Confirm Password" required />
+    <form id="signupForm">
+      <input id="email"    type="email"    placeholder="Email"    required>
+      <input id="pass"     type="password" placeholder="Password" required>
+      <input id="confirm"  type="password" placeholder="Confirm Password" required>
       <button type="submit">Sign Up</button>
     </form>
-    <div class="link">
-      Already have an account? <a href="login.html">Login</a>
-    </div>
+    <div class="link">Have an account? <a href="login.html">Log in</a></div>
   </div>
 
-  <!-- Firebase SDKs -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,createUserWithEmailAndPassword} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,setDoc,doc,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCfby-disoL5FUTfA2lZno87NKlSHC2y",
-      authDomain: "zinx-bet.firebaseapp.com",
-      projectId: "zinx-bet",
-      storageBucket: "zinx-bet.appspot.com",
-      messagingSenderId: "701258513012",
-      appId: "1:701258513012:web:ae5304ab5451e4619fa2f1",
-      measurementId: "G-3L1ELY3274"
-    };
+const firebaseConfig={apiKey:"AIzaSyCfby-disoL5FUTfA2lZno87NKlSHC2y",authDomain:"zinx-bet.firebaseapp.com",projectId:"zinx-bet",storageBucket:"zinx-bet.appspot.com",messagingSenderId:"701258513012",appId:"1:701258513012:web:ae5304ab5451e4619fa2f1",measurementId:"G-3L1ELY3274"};
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    const form = document.getElementById("signup-form");
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-      const confirm = document.getElementById("confirm").value;
-
-      if (password !== confirm) {
-        alert("Passwords do not match.");
-        return;
-      }
-
-      try {
-        const userCred = await createUserWithEmailAndPassword(auth, email, password);
-        const uid = userCred.user.uid;
-
-        await setDoc(doc(db, "users", uid), {
-          email,
-          isVIP: false,
-          createdAt: new Date()
-        });
-
-        alert("Signup successful!");
-        window.location.href = "dashboard.html";
-      } catch (err) {
-        alert(err.message);
-      }
-    });
-  </script>
+document.getElementById("signupForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const email=document.getElementById("email").value.trim();
+ const pass =document.getElementById("pass").value;
+ const conf =document.getElementById("confirm").value;
+ if(pass!==conf){alert("Passwords do not match");return;}
+ try{
+   const cred=await createUserWithEmailAndPassword(auth,email,pass);
+   await setDoc(doc(db,"users",cred.user.uid),{
+     email, isVIP:false, createdAt:serverTimestamp()
+   });
+   alert("Signup successful!"); window.location.href="dashboard.html";
+ }catch(err){alert(err.message);}
+});
+</script>
 </body>
 </html>
