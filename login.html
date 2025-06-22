@@ -2,89 +2,104 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Zinx Bet – Login</title>
-
   <style>
-    :root {
-      --gold: #ffd700;
-      --dark: #0e0e0e;
-    }
     body {
-      margin: 0;
-      height: 100vh;
+      background-color: #0d0d0d;
+      color: #ffd700;
+      font-family: 'Segoe UI', sans-serif;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
-      background: linear-gradient(135deg,var(--dark),#111);
-      font-family: "Segoe UI", Arial, sans-serif;
-      color: var(--gold);
-      text-align: center;
+      height: 100vh;
+      margin: 0;
     }
-    h2 { margin-bottom: 1rem; }
-    form { width: 90%; max-width: 380px; }
-    input, button {
+    .container {
+      background: #1a1a1a;
+      padding: 2rem;
+      border-radius: 10px;
       width: 100%;
-      padding: 12px;
-      margin: 8px 0;
+      max-width: 400px;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    input {
+      width: 100%;
+      padding: 0.8rem;
+      margin: 0.5rem 0;
+      border-radius: 5px;
       border: none;
-      border-radius: 6px;
-      font-size: 16px;
     }
-    input { background:#f8f8f8; }
     button {
-      background: var(--gold);
+      width: 100%;
+      padding: 0.8rem;
+      background-color: #ffd700;
       color: #000;
+      border: none;
       font-weight: bold;
+      border-radius: 5px;
       cursor: pointer;
+      margin-top: 1rem;
     }
-    a { color: var(--gold); text-decoration: underline; }
+    .link {
+      text-align: center;
+      margin-top: 1rem;
+      color: #aaa;
+    }
+    .link a {
+      color: #ffd700;
+      text-decoration: none;
+    }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h2>Welcome Back</h2>
+    <form id="login-form">
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
+    <div class="link">
+      Don't have an account? <a href="signup.html">Sign Up</a>
+    </div>
+  </div>
 
-  <h2>Login to <strong>Zinx Bet</strong></h2>
-
-  <form id="login-form">
-    <input type="email"  id="email"    placeholder="Email"    required />
-    <input type="password" id="pass"   placeholder="Password" required />
-    <button type="submit">Login</button>
-  </form>
-
-  <p>Don’t have an account? <a href="signup.html">Sign up</a></p>
-
-  <!-- Firebase & Login logic -->
+  <!-- Firebase Login Script -->
   <script type="module">
-    import { initializeApp }           from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    /* ----------  YOUR  FIREBASE CONFIG  ---------- */
     const firebaseConfig = {
-      apiKey:            "AIzaSyCfby-disoL5FUTfA2lZno87NKlSHC2y",
-      authDomain:        "zinx-bet.firebaseapp.com",
-      projectId:         "zinx-bet",
-      storageBucket:     "zinx-bet.appspot.com",
+      apiKey: "AIzaSyCfby-disoL5FUTfA2lZno87NKlSHC2y",
+      authDomain: "zinx-bet.firebaseapp.com",
+      projectId: "zinx-bet",
+      storageBucket: "zinx-bet.appspot.com",
       messagingSenderId: "701258513012",
-      appId:             "1:701258513012:web:ae5304ab5451e4619fa2f1",
-      measurementId:     "G-3L1ELY3274"
+      appId: "1:701258513012:web:ae5304ab5451e4619fa2f1",
+      measurementId: "G-3L1ELY3274"
     };
 
-    /* ----------  INIT  ---------- */
-    const app  = initializeApp(firebaseConfig);
+    const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    /* ----------  LOGIN HANDLER  ---------- */
-    document.getElementById("login-form").addEventListener("submit", async (e) => {
+    const form = document.getElementById("login-form");
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
+
       const email = document.getElementById("email").value.trim();
-      const pass  = document.getElementById("pass").value.trim();
+      const password = document.getElementById("password").value;
 
       try {
-        await signInWithEmailAndPassword(auth, email, pass);
+        await signInWithEmailAndPassword(auth, email, password);
+        alert("Login successful!");
         window.location.href = "dashboard.html";
       } catch (err) {
-        alert(`❌ Login error: ${err.message}`);
+        alert("Login failed: " + err.message);
       }
     });
   </script>
